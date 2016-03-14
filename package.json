@@ -1,0 +1,7 @@
+{
+    "name": "accountable service",
+    "author": "Víctor Rampérez",
+    "version": "1.0",
+    "module": "accounting_proxy_plugin.AccountingProxyPlugin",
+    "formats": ["URL"],
+}
