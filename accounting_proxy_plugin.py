@@ -4,7 +4,6 @@ from wstore.asset_manager.resource_plugins.plugin_error import PluginError
 from urlparse import urlparse
 
 import requests
-import json
 
 class AccountingProxyPlugin(Plugin):
 
@@ -44,7 +43,7 @@ class AccountingProxyPlugin(Plugin):
                 if price_model['priceType'] == 'usage' and price_model['unitOfMeasure'] in units:
                     found = True
 
-            if not fount:
+            if not found:
                 raise PluginError('No "usage" price type in the product_offering')
 
     def on_product_acquisition(self, asset, contract, order):
@@ -78,5 +77,5 @@ class AccountingProxyPlugin(Plugin):
 
                 if resp.status_code != 201:
                     raise PluginError('Error notifying the product acquisition to the accounting proxy')
-        else 
+        else: 
             raise PluginError('Contract must have a "pay per use" in the pricing_model')
