@@ -1,9 +1,10 @@
+from urlparse import urlparse
+import requests
+
+from django.conf import settings
+
 from wstore.asset_manager.resource_plugins.plugin import Plugin
 from wstore.asset_manager.resource_plugins.plugin_error import PluginError
-
-from urlparse import urlparse
-
-import requests
 
 class AccountingProxyPlugin(Plugin):
 
@@ -14,14 +15,37 @@ class AccountingProxyPlugin(Plugin):
         }[unit]
 
     def on_post_product_spec_validation(self, provider, asset):
-        # Check the url
-        url = urlparse(asset.get_url()).scheme + '://' + urlparse(asset.get_url()).netloc + '/accounting_proxy/urls'
-        payload = {'url': asset.get_url()}
+        # Get the apiKey for accounting notifications
+        acc_proxy_url = urlparse(asset.get_url()).scheme + '://' + urlparse(asset.get_url()).netloc
+        authorize_url = settings.AUTHORIZE_SERVICE
 
-        resp = requests.post(url, json=payload)
+        resp = requests.post(authorize_url, json={'url': acc_proxy_url})
 
-        if resp.status_code != 200:
-            raise PluginError('Invalid asset url')
+        if resp.status_code != 201:
+            raise PluginError('Error getting the api_key')
+
+        else:
+            # Check the url and send the apiKey
+            api_key = resp.json()['apiKey']
+
+            url = acc_proxy_url + '/accounting_proxy/urls'
+            headers = {'X-API-KEY': api_key}
+            payload = {'url': asset.get_url()}
+
+            resp = requests.post(url, headers=headers, json=payload)
+
+            if resp.status_code != 200:
+                raise PluginError('Invalid asset url')
+
+            else:
+                # Commit the apiKey received
+                authorize_url = settings.AUTHORIZE_SERVICE + '/' + api_key + '/commit' 
+
+                resp = requests.post(authorize_url)
+
+                if resp.status_code != 200: 
+                    raise PluginError('Error committing the api_key')
+
 
 
     def on_post_product_offering_validation(self, asset, product_offering):
