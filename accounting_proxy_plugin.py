@@ -21,30 +21,31 @@ class AccountingProxyPlugin(Plugin):
 
         resp = requests.post(authorize_url, json={'url': acc_proxy_url})
 
-        if resp.status_code != 202:
+        if resp.status_code != 201:
             raise PluginError('Error getting the api_key')
 
         else:
-            # Commit the apiKey received
+            # Check the url and send the apiKey
             api_key = resp.json()['apiKey']
 
-            authorize_url = settings.AUTHORIZE_SERVICE + '/' + api_key + '/commit' 
+            url = acc_proxy_url + '/accounting_proxy/urls'
+            headers = {'X-API-KEY': api_key}
+            payload = {'url': asset.get_url()}
 
-            resp = requests.post(authorize_url)
+            resp = requests.post(url, headers=headers, json=payload)
 
-            if resp.status_code != 201: 
-                raise PluginError('Error committing the api_key')
+            if resp.status_code != 200:
+                raise PluginError('Invalid asset url')
 
             else:
-                # Check the url and send the apiKey
-                url = acc_proxy_url + '/accounting_proxy/urls'
-                headers = {'X-API-KEY': api_key}
-                payload = {'url': asset.get_url()}
+                # Commit the apiKey received
+                authorize_url = settings.AUTHORIZE_SERVICE + '/' + api_key + '/commit' 
 
-                resp = requests.post(url, headers=headers, json=payload)
+                resp = requests.post(authorize_url)
 
-                if resp.status_code != 200:
-                    raise PluginError('Invalid asset url')
+                if resp.status_code != 200: 
+                    raise PluginError('Error committing the api_key')
+
 
 
     def on_post_product_offering_validation(self, asset, product_offering):
