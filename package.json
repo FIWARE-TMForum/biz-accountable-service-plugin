@@ -3,5 +3,8 @@
     "author": "Víctor Rampérez",
     "version": "1.0",
     "module": "accounting_proxy_plugin.AccountingProxyPlugin",
+    "media_types": [],
     "formats": ["URL"],
+    "overrides": [],
+    "form": { }
 }
