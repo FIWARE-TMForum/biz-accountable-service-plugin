@@ -79,22 +79,22 @@ class AccountingProxyPlugin(Plugin):
         # Send new buy notification to the accounting proxy
         url = urlparse(asset.get_url()).scheme + '://' + urlparse(asset.get_url()).netloc + '/accounting_proxy/buys'
 
-        if 'pay per use' in contract.pricing_model:
+        if 'pay_per_use' in contract.pricing_model:
 
             count = 0
-            for price_model in contract.pricing_model['pay per use']:
+            for price_model in contract.pricing_model['pay_per_use']:
                 if 'unit' in price_model:
                     unit = price_model['unit']
                     count += 1
 
             if count != 1:
-                raise PluginError('Wrong number of pricing components. Only supported one pricing component')
+                raise PluginError('Wrong number of pricing components. Only one pricing component is supported')
             else:
 
                 payload = { 
                     'productId': asset.product_id,
                     'orderId': order.order_id,
-                    'customer': order.customer,
+                    'customer': order.customer.username,
                     'productSpecification': {
                         'url': order.asset.get_url(),
                         'unit': unit,
