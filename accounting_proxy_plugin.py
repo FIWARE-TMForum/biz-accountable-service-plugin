@@ -31,7 +31,8 @@ class AccountingProxyPlugin(Plugin):
                 api_key = resp.json()['apiKey']
 
                 url = acc_proxy_url + '/accounting_proxy/urls'
-                headers = {'X-API-KEY': api_key}
+                headers = {'X-API-KEY': api_key,
+                           'authorization': 'bearer ' + provider.userprofile.access_token}
                 payload = {'url': asset.get_url()}
 
                 resp = requests.post(url, headers=headers, json=payload)
