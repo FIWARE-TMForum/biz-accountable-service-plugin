@@ -5,6 +5,7 @@ from django.conf import settings
 
 from wstore.asset_manager.resource_plugins.plugin import Plugin
 from wstore.asset_manager.resource_plugins.plugin_error import PluginError
+from wstore.models import User
 
 
 class AccountingProxyPlugin(Plugin):
@@ -31,8 +32,12 @@ class AccountingProxyPlugin(Plugin):
                 api_key = resp.json()['apiKey']
 
                 url = acc_proxy_url + '/accounting_proxy/urls'
-                headers = {'X-API-KEY': api_key,
-                           'authorization': 'bearer ' + provider.userprofile.access_token}
+                access_token = User.objects.get(pk=provider.managers[0]).userprofile.access_token
+                headers = {
+                    'X-API-KEY': api_key,
+                    'Authorization': 'bearer ' + access_token
+                }
+
                 payload = {'url': asset.get_url()}
 
                 resp = requests.post(url, headers=headers, json=payload)
