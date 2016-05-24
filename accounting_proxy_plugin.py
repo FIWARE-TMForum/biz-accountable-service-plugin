@@ -92,11 +92,11 @@ class AccountingProxyPlugin(Plugin):
             else:
 
                 payload = { 
-                    'productId': asset.product_id,
-                    'orderId': order.order_id,
+                    'productId': unicode(contract.product_id),
+                    'orderId': unicode(order.order_id),
                     'customer': order.customer.username,
                     'productSpecification': {
-                        'url': order.asset.get_url(),
+                        'url': asset.get_url(),
                         'unit': unit,
                         'recordType': self.record_type(unit)
                     }
