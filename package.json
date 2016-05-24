@@ -1,5 +1,5 @@
 {
-    "name": "accountable service",
+    "name": "Accountable service",
     "author": "Víctor Rampérez",
     "version": "1.0",
     "module": "accounting_proxy_plugin.AccountingProxyPlugin",
