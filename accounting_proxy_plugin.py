@@ -83,7 +83,7 @@ class AccountingProxyPlugin(Plugin):
 
     def on_product_acquisition(self, asset, contract, order):
         # Send new buy notification to the accounting proxy
-        url = urlparse(asset.get_url()).scheme + '://' + urlparse(asset.get_url()).netloc + '/accounting_proxy/buys'
+        url = urlparse(asset.get_url()).scheme + '://' + urlparse(asset.get_url()).netloc + '/accounting_proxy/newBuy'
 
         if 'pay_per_use' in contract.pricing_model:
 
@@ -112,5 +112,22 @@ class AccountingProxyPlugin(Plugin):
 
                 if resp.status_code != 201:
                     raise PluginError('Error notifying the product acquisition to the accounting proxy')
-        else: 
+        else:
             raise PluginError('Contract must have a "pay per use" in the pricing_model')
+
+    def on_product_suspension(self, asset, contract, order):
+        # Send product suspension notification to the accounting proxy
+        url = urlparse(asset.get_url()).scheme + '://' + urlparse(asset.get_url()).netloc + '/accounting_proxy/deleteBuy'
+
+        if 'pay_per_use' in contract.pricing_model:
+
+            payload = {
+                'productId': unicode(contract.product_id),
+                'orderId': unicode(order.order_id),
+                'customer': order.customer.username
+            }
+
+            resp = requests.post(url, json=payload)
+
+            if resp.status_code != 204:
+                raise PluginError('Error notifying the product suspension to the accounting proxy')
