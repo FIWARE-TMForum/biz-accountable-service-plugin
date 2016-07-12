@@ -40,7 +40,7 @@ class AccountingProxyPlugin(Plugin):
 
                 payload = {'url': asset.get_url()}
 
-                resp = requests.post(url, headers=headers, json=payload)
+                resp = requests.post(url, headers=headers, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=False)
 
                 if resp.status_code != 200:
                     raise PluginError('Invalid asset url')
@@ -108,7 +108,7 @@ class AccountingProxyPlugin(Plugin):
                     }
                 }
 
-                resp = requests.post(url, json=payload)
+                resp = requests.post(url, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=False)
 
                 if resp.status_code != 201:
                     raise PluginError('Error notifying the product acquisition to the accounting proxy')
@@ -127,7 +127,7 @@ class AccountingProxyPlugin(Plugin):
                 'customer': order.customer.username
             }
 
-            resp = requests.post(url, json=payload)
+            resp = requests.post(url, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=False)
 
             if resp.status_code != 204:
                 raise PluginError('Error notifying the product suspension to the accounting proxy')
