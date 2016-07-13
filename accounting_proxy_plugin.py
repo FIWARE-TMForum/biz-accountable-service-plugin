@@ -10,6 +10,8 @@ from wstore.models import User
 
 class AccountingProxyPlugin(Plugin):
 
+    verifyCerts = False
+
     def record_type(self, unit):
         return {
             'call': 'callusage',
@@ -40,7 +42,7 @@ class AccountingProxyPlugin(Plugin):
 
                 payload = {'url': asset.get_url()}
 
-                resp = requests.post(url, headers=headers, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=False)
+                resp = requests.post(url, headers=headers, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=self.verifyCerts)
 
                 if resp.status_code != 200:
                     raise PluginError('Invalid asset url')
@@ -63,7 +65,7 @@ class AccountingProxyPlugin(Plugin):
         # Check supported accounting units
         url = urlparse(asset.get_url()).scheme + '://' + urlparse(asset.get_url()).netloc + '/accounting_proxy/units'
 
-        resp = requests.get(url)
+        resp = requests.get(url, verify=self.verifyCerts)
 
         if resp.status_code != 200:
             raise PluginError('Error checking the supported accounting units')
@@ -108,7 +110,7 @@ class AccountingProxyPlugin(Plugin):
                     }
                 }
 
-                resp = requests.post(url, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=False)
+                resp = requests.post(url, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=self.verifyCerts)
 
                 if resp.status_code != 201:
                     raise PluginError('Error notifying the product acquisition to the accounting proxy')
@@ -127,7 +129,7 @@ class AccountingProxyPlugin(Plugin):
                 'customer': order.customer.username
             }
 
-            resp = requests.post(url, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=False)
+            resp = requests.post(url, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=self.verifyCerts)
 
             if resp.status_code != 204:
                 raise PluginError('Error notifying the product suspension to the accounting proxy')
