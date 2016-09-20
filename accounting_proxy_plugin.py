@@ -126,7 +126,10 @@ class AccountingProxyPlugin(Plugin):
             payload = {
                 'productId': unicode(contract.product_id),
                 'orderId': unicode(order.order_id),
-                'customer': order.customer.username
+                'customer': order.customer.username,
+                'productSpecification': {
+                    'url': asset.get_url()
+                }
             }
 
             resp = requests.post(url, json=payload, cert=(settings.NOTIF_CERT_FILE, settings.NOTIF_CERT_KEY_FILE), verify=self.verifyCerts)
